@@ -11,7 +11,8 @@ var __ = function(
   config,
   trello,
   translator,
-  trelloApiCommands
+  trelloApiCommands,
+  defaults
 ) {
   var trelloApiCommand = {};
 
@@ -39,7 +40,7 @@ var __ = function(
 
     var listIds = [];
 
-    if (options.list) {
+    if (options.list && options.list != "*") {
       listIds.push(
         translator.getListIdByBoardNameAndListName(options.board, options.list)
       );
@@ -85,22 +86,30 @@ var __ = function(
   };
 
   trelloApiCommand.nomnomProgramCall = function() {
+    var boardOption = {
+      abbr: "b",
+      metavar: "BOARD",
+      help: "The board name which contains the list of cards to show",
+      required: true
+    };
+    if (defaults.board && defaults.board != "") {
+      boardOption.default = defaults.board;
+    }
+    var listOption = {
+      abbr: "l",
+      metavar: "LIST",
+      help: "The name of the list whose cards to show",
+      required: false
+    };
+    if (defaults.list && defaults.list != "") {
+      listOption.default = defaults.list;
+    }
     program
       .command("show-cards")
       .help("Show the cards on a list")
       .options({
-        board: {
-          abbr: "b",
-          metavar: "BOARD",
-          help: "The board name which contains the list of cards to show",
-          required: true
-        },
-        list: {
-          abbr: "l",
-          metavar: "LIST",
-          help: "The name of the list whose cards to show",
-          required: false
-        },
+        board: boardOption,
+        list: listOption,
         showListName: {
           abbr: "n",
           help:

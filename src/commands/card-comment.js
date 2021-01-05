@@ -18,7 +18,7 @@ var __ = function(program, output, logger, config, trello, translator, commands,
     }
 
     var lists = [];
-    if (options.list) {
+    if (options.list && options.list != "*") {
       var id = ""
       try {
         id = translator.getListIdByBoardNameAndListName(
