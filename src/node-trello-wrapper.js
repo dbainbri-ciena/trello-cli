@@ -1,6 +1,6 @@
 "use strict";
 
-var __ = function(output, logger, config, authentication) {
+var __ = function(output, logger, config, authentication, defaults) {
   var Trello = require("node-trello");
 
   var trelloObj = new Trello(config.get("appKey"), authentication.getToken());

@@ -2,7 +2,8 @@
 
 var _ = require("underscore");
 
-var __ = function(program, output, logger, config, trello, translator) {
+var __ = function(program, output, logger, config, trello, translator, commands, defaults) {
+
   var trelloApiCommand = {};
 
   trelloApiCommand.makeTrelloApiCall = function(options, onComplete) {
@@ -12,18 +13,25 @@ var __ = function(program, output, logger, config, trello, translator) {
     try {
       boardId = translator.getBoardIdByName(options.board);
     } catch (err) {
-      logger.warning("Unknown board." + err);
+      logger.error(`Unknown board [${options.board}]. ${err}`);
       return;
     }
 
     var lists = [];
     if (options.list) {
-      lists.push({
-        name: options.list,
-        id: translator.getListIdByBoardNameAndListName(
+      var id = ""
+      try {
+        id = translator.getListIdByBoardNameAndListName(
           options.board,
           options.list
         )
+      } catch (err) {
+        logger.error(`Unknown list [${options.list}] on board [${options.board}]. ${err}`);
+        return;
+      }
+      lists.push({
+        name: options.list,
+        id: id
       });
     } else {
       _.each(translator.cache.translations.lists, function(oneList, listId) {
@@ -69,14 +77,14 @@ var __ = function(program, output, logger, config, trello, translator) {
           numberOfListSearch = numberOfListSearch + 1;
           if (numberOfListSearch == numberOfList) {
             if (cards.length == 0) {
-              logger.warning("No matching cards found.");
+              logger.error(`No matching cards found: [${options.card}].`);
               return;
             } else if (cards.length > 1) {
               var msg = "Multiple matching cards found:";
               for (var i in cards) {
                 msg += "\n  " + cards[i].cardName + " in " + cards[i].listName;
               }
-              logger.warning(msg);
+              logger.error(msg);
               return;
             }
             var args = [
@@ -98,30 +106,42 @@ var __ = function(program, output, logger, config, trello, translator) {
   };
 
   trelloApiCommand.nomnomProgramCall = function() {
+    var boardOption = {
+      abbr: "b",
+      metavar: "BOARD",
+      help: "The board on which the card exists",
+      required: true
+    };
+    if (defaults.board && defaults.board != "") {
+      boardOption.default = defaults.board;
+    }
+    var listOption = {
+      abbr: "l",
+      metavar: "LIST",
+      help: "The list on which the card exists",
+      required: false
+    };
+    if (defaults.list && defaults.list != "") {
+      listOption.default = defaults.list;
+    }
+    var cardOption = {
+      abbr: "c",
+      metavar: "CARD",
+      help: "The card's name/id/url",
+      required: true
+    };
+    if (defaults.card && defaults.card != "") {
+      cardOption.default = defaults.card;
+    }
     program
       .command("card-comment")
       .help("Add a comment to a card")
       .options({
-        board: {
-          abbr: "b",
-          metavar: "BOARD",
-          help: "The board on which the card exists",
-          required: true
-        },
-        list: {
-          abbr: "l",
-          metavar: "LIST",
-          help: "The list on which the card exists",
-          required: false
-        },
-        card: {
-          position: 1,
-          metavar: "<card>",
-          help: "The card's name/id/url",
-          required: true
-        },
+        board: boardOption,
+        list: listOption,
+        card: cardOption,
         text: {
-          position: 2,
+          position: 1,
           metavar: "<text>",
           help: "The text of thje comment to add",
           required: true
