@@ -90,22 +90,29 @@ if (process.argv[2] == 'set-auth') {
 
 if (process.argv[2] == "set-board") {
   defaults.board = process.argv[3];
-  fs.writeFileSync(defaultsPath, JSON.stringify(defaults));
+  fs.writeFileSync(defaultsPath, JSON.stringify(defaults, null, 2));
   console.log("Default board set");
   process.exit(0);
 }
 
 if (process.argv[2] == "set-list") {
   defaults.list = process.argv[3];
-  fs.writeFileSync(defaultsPath, JSON.stringify(defaults));
+  fs.writeFileSync(defaultsPath, JSON.stringify(defaults, null, 2));
   console.log("Default list set");
   process.exit(0);
 }
 
 if (process.argv[2] == "set-card") {
   defaults.card = process.argv[3];
-  fs.writeFileSync(defaultsPath, JSON.stringify(defaults));
+  fs.writeFileSync(defaultsPath, JSON.stringify(defaults, null, 2));
   console.log("Default card set");
+  process.exit(0);
+}
+
+if (process.argv[2] == "set-since") {
+  defaults.since = process.argv[3];
+  fs.writeFileSync(defaultsPath, JSON.stringify(defaults, null, 2));
+  console.log("Default since time set");
   process.exit(0);
 }
 
