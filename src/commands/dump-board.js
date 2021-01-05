@@ -41,7 +41,7 @@ var __ = function(
         actions_limit: 100,
         actions_since: since,
         cards: "open",
-        card_fields: "id,name,labels,badges",
+        card_fields: "id,idList,name,labels,badges",
         card_attachments: true,
         labels: "all",
         lists: "open",
